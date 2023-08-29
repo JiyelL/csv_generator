@@ -1,0 +1,28 @@
+<?php
+// Get the folder path from the URL parameter
+$folderPath = $_GET['folderPath'];
+
+// Validate the folder path
+if (!is_dir($folderPath)) {
+  header('HTTP/1.1 404 Not Found');
+  exit;
+}
+
+// Read the directory contents
+$files = scandir($folderPath);
+
+// Initialize the CSV output
+$csv = "";
+
+// Loop through the files and build the CSV rows
+foreach ($files as $file) {
+  if ($file->isFile() && strpos($file->getName(), '.') !== false) {
+    $row = array_map('trim', explode(',', $file->getName()));
+    $csv .= implode(",", $row) . "\n";
+  }
+}
+
+// Output the CSV content
+header('Content-Type: application/csv');
+header('Content-Disposition: attachment; filename="soilRecommends_history.csv"');
+echo $csv;
